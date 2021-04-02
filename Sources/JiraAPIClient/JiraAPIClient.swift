@@ -27,9 +27,9 @@ public class JiraAPIClient<AuthSession>: ObservableObject where AuthSession: Aut
 
     var signingIn: AnyCancellable?
 
-    public func signIn() -> AnyPublisher<Void, Swift.Error> {
+    public func signIn() -> AnyPublisher<Never, Swift.Error> {
         auth.signIn()
-            .mapError { $0 as Swift.Error }
+            .mapError { $0 }
             .eraseToAnyPublisher()
     }
 }

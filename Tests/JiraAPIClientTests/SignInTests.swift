@@ -24,14 +24,12 @@ final class SignInTests: JiraAPIClientTests {
                     XCTFail("Sign in should succeed")
                 }
                 signInFinished.fulfill()
-            }, receiveValue: { _ in
-                XCTFail("Sign in should not receive value")
             })
 
         wait(for: [signInFinished], timeout: 1)
     }
 
-    func testSignInFails() {
+    func testSignInFailsFromAuthenticationSession() {
         let signInFinished = XCTestExpectation(description: "Sign in finished")
 
         let client = JiraAPIClient<MockFailAuthenticationSession>(configuration: testConfigF)
@@ -41,12 +39,11 @@ final class SignInTests: JiraAPIClientTests {
                 switch completion {
                 case .finished:
                     XCTFail("Sign in should fail")
-                case .failure:
+                case .failure(let error):
+                    XCTAssertEqual(error as? TestError, TestError.authenticationFail, "error should be from auth")
                     break // success
                 }
                 signInFinished.fulfill()
-            }, receiveValue: { _ in
-                XCTFail("Sign in should not receive value")
             })
 
         wait(for: [signInFinished], timeout: 1)
@@ -55,6 +52,7 @@ final class SignInTests: JiraAPIClientTests {
     #if !canImport(ObjectiveC)
     static var allTests: [XCTestCaseEntry] = [
         ("testSignInSuccessful", testSignInSuccessful),
+        ("testSignInFailsFromAuthenticationSession", testSignInFailsFromAuthenticationSession),
     ]
     #endif
 }
