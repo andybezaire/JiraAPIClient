@@ -5,6 +5,7 @@
 //  Created by Andy Bezaire on 2.4.2021.
 //
 
+import AuthenticationServices
 import Foundation
 import JiraAPI
 
@@ -25,6 +26,7 @@ public extension JiraAPIClient {
         let callbackURLScheme: CallbackURLScheme
         let callbackURLHost: CallbackURLHost
         let userBoundValue: UserBoundValue
+        let authenticationSessionContextProvider: ASWebAuthenticationPresentationContextProviding?
 
         var redirectURI: RedirectURI {
             var uri = URLComponents()
@@ -64,7 +66,8 @@ public extension JiraAPIClient {
             scopes: [Scope],
             callbackURLScheme: CallbackURLScheme,
             callbackURLHost: CallbackURLHost,
-            userBoundValue: UserBoundValue
+            userBoundValue: UserBoundValue,
+            authenticationSessionContextProvider: ASWebAuthenticationPresentationContextProviding? = ContextProvider()
         ) {
             self.isAuthorizationEphemeral = isAuthorizationEphemeral
             self.clientID = clientID
@@ -73,6 +76,14 @@ public extension JiraAPIClient {
             self.callbackURLScheme = callbackURLScheme
             self.callbackURLHost = callbackURLHost
             self.userBoundValue = userBoundValue
+            self.authenticationSessionContextProvider = authenticationSessionContextProvider
+        }
+
+        /// Default context provider makes a new modal presentation (at least in ios)
+        public class ContextProvider: NSObject, ASWebAuthenticationPresentationContextProviding {
+            public func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
+                return ASPresentationAnchor()
+            }
         }
     }
 }

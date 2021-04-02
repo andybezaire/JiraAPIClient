@@ -13,9 +13,7 @@ import JiraAPI
 typealias Code = String
 
 extension JiraAPIClient {
-    func authorizationCode (
-        contextProvider: ASWebAuthenticationPresentationContextProviding = contextProvider
-    ) -> AnyPublisher<Code, Swift.Error> {
+    func authorizationCode() -> AnyPublisher<Code, Swift.Error> {
         return Future<URL, Swift.Error> { [self] completion in
             guard let authURL = try? JiraAPI.Auth.URL.authorize(
                 clientID: config.clientID,
@@ -24,7 +22,12 @@ extension JiraAPIClient {
                 userBoundValue: config.userBoundValue
             ) else { completion(.failure(Error.invalidAuthURL)); return }
             let authSession =
-                ASWebAuthenticationSession(url: authURL, callbackURLScheme: config.callbackURLScheme) { url, error in
+                AuthSession(
+                    url: authURL,
+                    callbackURLScheme: config.callbackURLScheme,
+                    presentationContextProvider: config.authenticationSessionContextProvider,
+                    prefersEphemeralWebBrowserSession: config.isAuthorizationEphemeral
+                ) { url, error in
                     if let error = error {
                         completion(.failure(error))
                     } else if let url = url {
@@ -32,8 +35,6 @@ extension JiraAPIClient {
                     }
                 }
 
-            authSession.presentationContextProvider = contextProvider
-            authSession.prefersEphemeralWebBrowserSession = config.isAuthorizationEphemeral
             authSession.start()
         }
         .map { $0.queryItem(named: "code") }
@@ -42,14 +43,6 @@ extension JiraAPIClient {
             return code
         }
         .eraseToAnyPublisher()
-    }
-
-    private static let contextProvider = ContextProvider()
-    /// Default context provider makes a new modal presentation (at least in ios)
-    private class ContextProvider: NSObject, ASWebAuthenticationPresentationContextProviding {
-        func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
-            return ASPresentationAnchor()
-        }
     }
 }
 

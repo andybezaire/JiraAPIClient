@@ -15,6 +15,7 @@ let package = Package(
     ],
     targets: [
         .target(name: "JiraAPIClient", dependencies: ["Authorization", "DefaultsWrapper", "JiraAPI"]),
-        .testTarget(name: "JiraAPIClientTests", dependencies: ["JiraAPIClient"]),
+        .target(name: "JiraAPIClientTestUtils", dependencies: ["JiraAPIClient"], path: "Tests/JiraAPIClientTestUtils"),
+        .testTarget(name: "JiraAPIClientTests", dependencies: ["JiraAPIClient", "JiraAPIClientTestUtils"]),
     ]
 )

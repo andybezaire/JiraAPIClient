@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension JiraAPIClient {
+public extension JiraAPIClient {
     enum Error: Swift.Error {
         case invalidAuthURL
         case authorizationCodeNotFound

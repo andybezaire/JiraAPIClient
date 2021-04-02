@@ -1,15 +1,41 @@
-import XCTest
+//
+//  JiraAPIClientTests.swift
+//
+//
+//  Created by Andy Bezaire on 2.4.2021.
+//
+
+import Combine
 @testable import JiraAPIClient
+import JiraAPIClientTestUtils
+import XCTest
 
-final class JiraAPIClientTests: XCTestCase {
-    func testExample() {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct
-        // results.
-//        XCTAssertEqual(JiraAPIClient().text, "Hello, World!")
+ class JiraAPIClientTests: XCTestCase {
+    // MARK: - Configs
+
+    let testConfigS = JiraAPIClient<MockSuccessAuthenticationSession>.Configuration(
+        isAuthorizationEphemeral: true,
+        clientID: "CLIENT_ID",
+        clientSecret: "CLIENT_SECRET",
+        scopes: ["SCOPE_1", "SCOPE_2"],
+        callbackURLScheme: "CALLBACK-URL-SCHEME",
+        callbackURLHost: "CALLBACK_URL_HOST",
+        userBoundValue: "USER_BOUND_VALUE"
+    )
+
+    let testConfigF = JiraAPIClient<MockFailAuthenticationSession>.Configuration(
+        isAuthorizationEphemeral: true,
+        clientID: "CLIENT_ID",
+        clientSecret: "CLIENT_SECRET",
+        scopes: ["SCOPE_1", "SCOPE_2"],
+        callbackURLScheme: "CALLBACK-URL-SCHEME",
+        callbackURLHost: "CALLBACK_URL_HOST",
+        userBoundValue: "USER_BOUND_VALUE"
+    )
+
+    var cancellable: AnyCancellable?
+
+    override func tearDown() {
+        cancellable = nil
     }
-
-    static var allTests = [
-        ("testExample", testExample),
-    ]
 }
