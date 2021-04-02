@@ -54,6 +54,8 @@ public class MockFailAuthenticationSession: MockAuthenticationSession {
     override var error: Error? { TestError.authenticationFail }
 }
 
+public class MockFailInternalAuthenticationSession: MockAuthenticationSession {}
+
 public enum TestError: Error {
     case authenticationFail
 }

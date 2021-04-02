@@ -11,6 +11,6 @@ public extension JiraAPIClient {
     enum Error: Swift.Error {
         case invalidAuthURL
         case authorizationCodeNotFound
-        case invalidRequest(named: String)
+        case authorizationCodeInternalError
     }
 }

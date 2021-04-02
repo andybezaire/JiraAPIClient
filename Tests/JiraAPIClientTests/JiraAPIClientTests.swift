@@ -33,6 +33,16 @@ import XCTest
         userBoundValue: "USER_BOUND_VALUE"
     )
 
+    let testConfigFI = JiraAPIClient<MockFailInternalAuthenticationSession>.Configuration(
+        isAuthorizationEphemeral: true,
+        clientID: "CLIENT_ID",
+        clientSecret: "CLIENT_SECRET",
+        scopes: ["SCOPE_1", "SCOPE_2"],
+        callbackURLScheme: "CALLBACK-URL-SCHEME",
+        callbackURLHost: "CALLBACK_URL_HOST",
+        userBoundValue: "USER_BOUND_VALUE"
+    )
+
     var cancellable: AnyCancellable?
 
     override func tearDown() {

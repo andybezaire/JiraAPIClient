@@ -32,6 +32,8 @@ extension JiraAPIClient {
                         completion(.failure(error))
                     } else if let url = url {
                         completion(.success(url))
+                    } else {
+                        completion(.failure(Error.authorizationCodeInternalError))
                     }
                 }
 
