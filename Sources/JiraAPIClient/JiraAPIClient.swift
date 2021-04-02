@@ -13,9 +13,7 @@ public class JiraAPIClient<AuthSession>: ObservableObject where AuthSession: Aut
 
     func doGetTokens() -> AnyPublisher<Auth.Tokens, Swift.Error> {
         authorizationCode()
-            .map { code in
-                Auth.Tokens(token: "TOKEN from: \(code)", refresh: "REFRESH from: \(code)")
-            }
+            .flatMap(oauthTokens)
             .eraseToAnyPublisher()
     }
 

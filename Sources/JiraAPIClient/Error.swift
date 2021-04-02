@@ -12,5 +12,6 @@ public extension JiraAPIClient {
         case invalidAuthURL
         case authorizationCodeNotFound
         case authorizationCodeInternalError
+        case invalidOauthTokenRequest
     }
 }
