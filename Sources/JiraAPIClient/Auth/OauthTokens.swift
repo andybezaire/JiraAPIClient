@@ -21,10 +21,26 @@ extension JiraAPIClient {
             return Fail(error: Error.invalidOauthTokenRequest)
                 .eraseToAnyPublisher()
         }
+
+        logger?.debug("Tokens fetch request: \(request.oneLiner)")
+
         return URLSession.shared.dataTaskPublisher(for: request)
+            .mapError { _ in Error.oauthTokenRequestFailure }
             .map(\.data)
-            .decode(type: JiraAPI.Models.OauthTokenResponse.self, decoder: JSONDecoder())
+            .flatMap { Just($0)
+                .decode(type: JiraAPI.Models.OauthTokenResponse.self, decoder: JSONDecoder())
+                .mapError { _ in Error.oauthTokenDecodeFailure }
+            }
             .map { Auth.Tokens(token: $0.token, refresh: $0.refresh) }
+            .log(to: logger, prefix: "Tokens fetch") { logger, output in
+                logger.log("Tokens fetch got tokens: \(output, privacy: .private)")
+            }
             .eraseToAnyPublisher()
+    }
+}
+
+extension Auth.Tokens: CustomStringConvertible {
+    public var description: String {
+        "token: \(token), refresh: \(refresh ?? "nil")"
     }
 }

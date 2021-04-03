@@ -45,6 +45,9 @@ extension JiraAPIClient {
             guard let code = $0 else { throw Error.authorizationCodeNotFound }
             return code
         }
+        .log(to: logger, prefix: "Authorization code fetch") { logger, output in
+            logger.log("Authorization code fetch got code: \(output, privacy: .private)")
+        }
         .eraseToAnyPublisher()
     }
 }
