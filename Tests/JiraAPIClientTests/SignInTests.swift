@@ -7,6 +7,7 @@
 
 @testable import JiraAPIClient
 import JiraAPIClientTestUtils
+import Mocker
 import XCTest
 
 final class SignInTests: JiraAPIClientTests {
@@ -15,12 +16,20 @@ final class SignInTests: JiraAPIClientTests {
 
         let client = JiraAPIClient<MockSuccessAuthenticationSession>(configuration: testConfigS, logger: logger)
 
+        let url = URL(string: "https://auth.atlassian.com/oauth/token")!
+        let data = #"{"access_token":"ACCESS_TOKEN","refresh_token":"REFRESH_TOKEN"}"#
+            .data(using: .utf8)!
+        
+        Mock(url: url, dataType: .json, statusCode: 200, data: [.post: data])
+            .register()
+
         cancellable = client.signIn()
             .sink(receiveCompletion: { completion in
                 switch completion {
                 case .finished:
                     break // success
-                case .failure:
+                case .failure(let error):
+                    print("ERROR: \(error)")
                     XCTFail("Sign in should succeed")
                 }
                 signInFinished.fulfill()
@@ -41,7 +50,7 @@ final class SignInTests: JiraAPIClientTests {
                     XCTFail("Sign in should fail")
                 case .failure(let error):
                     XCTAssertEqual(error as? TestError, TestError.authenticationFail, "error should be from auth")
-                    break // success
+                    // success
                 }
                 signInFinished.fulfill()
             })
@@ -67,7 +76,7 @@ final class SignInTests: JiraAPIClientTests {
                         JiraAPIClient<MockFailInternalAuthenticationSession>.Error.authorizationCodeInternalError,
                         "error should be from auth"
                     )
-                    break // success
+                    // success
                 }
                 signInFinished.fulfill()
             })
