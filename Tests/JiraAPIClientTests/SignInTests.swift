@@ -13,7 +13,7 @@ final class SignInTests: JiraAPIClientTests {
     func testSignInSuccessful() {
         let signInFinished = XCTestExpectation(description: "Sign in finished")
 
-        let client = JiraAPIClient<MockSuccessAuthenticationSession>(configuration: testConfigS)
+        let client = JiraAPIClient<MockSuccessAuthenticationSession>(configuration: testConfigS, logger: logger)
 
         cancellable = client.signIn()
             .sink(receiveCompletion: { completion in

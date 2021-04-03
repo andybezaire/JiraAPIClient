@@ -7,6 +7,7 @@
 
 import AuthenticationServices
 import Combine
+import CombineExtras
 import Foundation
 import JiraAPI
 

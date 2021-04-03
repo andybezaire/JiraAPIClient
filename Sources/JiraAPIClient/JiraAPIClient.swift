@@ -2,14 +2,16 @@ import AuthenticationServices
 import Authorization
 import Combine
 import Foundation
+import os.log
 
 public class JiraAPIClient<AuthSession>: ObservableObject where AuthSession: AuthenticationSession {
-    public init(configuration: Configuration) {
+    public init(configuration: Configuration, logger: Logger? = nil) {
         self.config = configuration
+        self.logger = logger
     }
 
     internal let config: Configuration
-    lazy var auth: Auth = .init(doGetTokens: doGetTokens, doRefreshToken: doRefreshToken)
+    lazy var auth: Auth = .init(doGetTokens: doGetTokens, doRefreshToken: doRefreshToken, logger: logger)
 
     func doGetTokens() -> AnyPublisher<Auth.Tokens, Swift.Error> {
         authorizationCode()
@@ -24,6 +26,8 @@ public class JiraAPIClient<AuthSession>: ObservableObject where AuthSession: Aut
     @Published var error: Swift.Error?
 
     var signingIn: AnyCancellable?
+
+    var logger: Logger?
 
     public func signIn() -> AnyPublisher<Never, Swift.Error> {
         auth.signIn()

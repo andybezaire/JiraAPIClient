@@ -8,9 +8,10 @@
 import Combine
 @testable import JiraAPIClient
 import JiraAPIClientTestUtils
+import os.log
 import XCTest
 
- class JiraAPIClientTests: XCTestCase {
+class JiraAPIClientTests: XCTestCase {
     // MARK: - Configs
 
     let testConfigS = JiraAPIClient<MockSuccessAuthenticationSession>.Configuration(
@@ -44,6 +45,8 @@ import XCTest
     )
 
     var cancellable: AnyCancellable?
+
+    let logger = Logger(subsystem: "com.example.jiraapiclient", category: "JiraAPIClientTests")
 
     override func tearDown() {
         cancellable = nil
