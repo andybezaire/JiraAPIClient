@@ -40,13 +40,16 @@ public extension JiraAPIClient {
 
         /// Create a configuration object
         /// - Parameters:
-        ///   - isAuthorizationEphemeral: false if you want the auth browser window
-        ///   to use the safari settings for that user, default is false
+        ///   - isAuthorizationEphemeral: false if you want the authentication session
+        ///   to have access to the safari saved account and passwords for that user, default is false
         ///   - clientID: (required) Set this to the Client ID for your app. Find this in Settings
-        ///   for your app in the developer console.
+        ///   for your app in the [developer console](https://developer.atlassian.com/console/myapps/).
+        ///   - clientSecret: (required) Set this to the Secret for your app. Find this in Settings
+        ///   for your app in the [developer console](https://developer.atlassian.com/console/myapps/).
         ///   - scopes: (required) Set this to the desired scopes: Separate multiple scopes
         ///   with a space. Only choose from the scopes that you have already added to the APIs
-        ///   for your app in the developer console. You may specify scopes from multiple products.
+        ///   for your app in the [developer console](https://developer.atlassian.com/console/myapps/).
+        ///   You may specify scopes from multiple products.
         ///   - callbackURLScheme: (required) Set this to the callback URL configured in Authorization
         ///   for your app in the [developer console](https://developer.atlassian.com/console/myapps/).
         ///   - callbackURLHost: (required) Set this to the callback URL configured in Authorization
@@ -59,6 +62,9 @@ public extension JiraAPIClient {
         ///    authentication library with OAuth 2.0 support. For more information, including why this parameter
         ///    is required for security, see [What is the state parameter used for?](
         ///    https://developer.atlassian.com/cloud/jira/platform/oauth-2-3lo-apps/#faq3).
+        ///   - authenticationSessionContextProvider: The context used to present the authentication session sheet.
+        ///    Defaults to current context.
+        ///   - isUsingRefresh: If true, then also ask for the refresh token along with the access token. default `true`
         public init(
             isAuthorizationEphemeral: Bool = false,
             clientID: ClientID,
@@ -67,12 +73,13 @@ public extension JiraAPIClient {
             callbackURLScheme: CallbackURLScheme,
             callbackURLHost: CallbackURLHost,
             userBoundValue: UserBoundValue,
-            authenticationSessionContextProvider: ASWebAuthenticationPresentationContextProviding? = ContextProvider()
+            authenticationSessionContextProvider: ASWebAuthenticationPresentationContextProviding? = ContextProvider(),
+            isUsingRefresh: Bool = true
         ) {
             self.isAuthorizationEphemeral = isAuthorizationEphemeral
             self.clientID = clientID
             self.clientSecret = clientSecret
-            self.scopes = scopes
+            self.scopes = scopes + (isUsingRefresh ? ["offline_access"] : [])
             self.callbackURLScheme = callbackURLScheme
             self.callbackURLHost = callbackURLHost
             self.userBoundValue = userBoundValue

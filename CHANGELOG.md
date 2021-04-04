@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 ### Changed
+- added refresh token to the oauth token request with a boolean flag to disable if desired
 ### Deprecated
 ### Removed
 ### Fixed
