@@ -20,7 +20,8 @@ public class JiraAPIClient<AuthSession>: ObservableObject where AuthSession: Aut
     }
 
     func doRefreshToken(refresh: Auth.Refresh) -> AnyPublisher<Auth.Tokens, Swift.Error> {
-        fatalError()
+        oauthTokensRefresh(for: refresh)
+            .eraseToAnyPublisher()
     }
 
     @Published var error: Swift.Error?
@@ -33,5 +34,12 @@ public class JiraAPIClient<AuthSession>: ObservableObject where AuthSession: Aut
         auth.signIn()
             .mapError { $0 }
             .eraseToAnyPublisher()
+    }
+}
+
+public extension JiraAPIClient {
+    /// Force refresh of the authorization tokens. This is intended to be used while debugging and not for normal use.
+    func forceTokenRefresh() {
+        auth.forceTokenRefresh()
     }
 }
