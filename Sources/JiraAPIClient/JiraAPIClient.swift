@@ -42,13 +42,7 @@ public class JiraAPIClient<AuthSession>: ObservableObject where AuthSession: Aut
     public func getCloudID() {
         if let request = try? JiraAPI.Request.cloudResources() {
 
-            logger?.debug("getCloudID request: \(request.oneLiner)")
-
             fetchingCloudID = auth.fetch(request)
-                .logOutput(to: logger) { (logger, result) in
-                    let bytes = result.data.count
-                    logger.debug("getCloudID response: \(result.response.oneLiner) \(bytes) byte(s)")
-                }
                 .map(\.data)
                 .sink(receiveCompletion: { completion in
                     print("COMPLETED: \(completion)")
