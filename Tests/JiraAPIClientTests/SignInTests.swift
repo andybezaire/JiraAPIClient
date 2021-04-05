@@ -69,8 +69,6 @@ final class SignInTests: JiraAPIClientTests {
                 case .finished:
                     XCTFail("Sign in should fail")
                 case .failure(let error):
-                    print("ERROR \(error)")
-                    print("ERROR \(type(of: error))")
                     XCTAssertEqual(
                         error as? JiraAPIClient<MockFailInternalAuthenticationSession>.Error,
                         JiraAPIClient<MockFailInternalAuthenticationSession>.Error.authorizationCodeInternalError,

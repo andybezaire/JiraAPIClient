@@ -22,13 +22,7 @@ extension JiraAPIClient {
                 .eraseToAnyPublisher()
         }
 
-        logger?.debug("Tokens fetch request: \(request.oneLiner)")
-
-        return URLSession.shared.dataTaskPublisher(for: request)
-            .logOutput(to: logger) { (logger, result) in
-                let bytes = result.data.count
-                logger.debug("Tokens fetch response: \(result.response.oneLiner) \(bytes) byte(s)")
-            }
+        return URLSession.shared.loggingDataTask(for: request, using: logger, prefix: "Tokens fetch")
             .mapError { _ in Error.oauthTokenRequestFailure }
             .map(\.data)
             .flatMap { Just($0)

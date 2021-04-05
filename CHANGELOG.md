@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 ### Changed
+- using logging data task from newer version of combine extras
 ### Deprecated
 ### Removed
 ### Fixed
