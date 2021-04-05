@@ -2,6 +2,7 @@ import AuthenticationServices
 import Authorization
 import Combine
 import Foundation
+import JiraAPI
 import os.log
 
 public class JiraAPIClient<AuthSession>: ObservableObject where AuthSession: AuthenticationSession {
@@ -34,6 +35,30 @@ public class JiraAPIClient<AuthSession>: ObservableObject where AuthSession: Aut
         auth.signIn()
             .mapError { $0 }
             .eraseToAnyPublisher()
+    }
+
+    var fetchingCloudID: AnyCancellable?
+
+    public func getCloudID() {
+        if let request = try? JiraAPI.Request.cloudResources() {
+
+            logger?.debug("getCloudID request: \(request.oneLiner)")
+
+            fetchingCloudID = auth.fetch(request)
+                .logOutput(to: logger) { (logger, result) in
+                    let bytes = result.data.count
+                    logger.debug("getCloudID response: \(result.response.oneLiner) \(bytes) byte(s)")
+                }
+                .map(\.data)
+                .sink(receiveCompletion: { completion in
+                    print("COMPLETED: \(completion)")
+                }, receiveValue: { data in
+                    let body = String(data: data, encoding: .utf8) ?? "nil"
+                    print("BODY: \(body)")
+                })
+        } else {
+            print("big error")
+        }
     }
 }
 
