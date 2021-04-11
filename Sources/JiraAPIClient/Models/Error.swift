@@ -15,12 +15,14 @@ public extension JiraAPIClient {
         case invalidOauthTokenRequest
         case oauthTokenRequestFailure
         case oauthTokenDecodeFailure
+        case noCurrentResourceID
     }
 }
 
 extension JiraAPIClient.Error: LocalizedError {
     public var errorDescription: String? {
-        switch self {case .invalidAuthURL:
+        switch self {
+        case .invalidAuthURL:
             return "Invalid authorization url."
         case .authorizationCodeNotFound:
             return "Authorization code not found in payload."
@@ -32,6 +34,8 @@ extension JiraAPIClient.Error: LocalizedError {
             return "Failure during oauth token request."
         case .oauthTokenDecodeFailure:
             return "Failure decoding oauth token from payload."
+        case .noCurrentResourceID:
+            return "Can't access any resources."
         }
     }
 }

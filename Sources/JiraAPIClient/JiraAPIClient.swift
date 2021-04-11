@@ -5,11 +5,12 @@ import Foundation
 import JiraAPI
 import os.log
 
-public class JiraAPIClient<AuthSession>: ObservableObject where AuthSession: AuthenticationSession {
-    public init(configuration: Configuration, logger: Logger? = nil, authLogger: Logger? = nil) {
+public class JiraAPIClient<AuthSession> where AuthSession: AuthenticationSession {
+    public init(configuration: Configuration, logger: Logger? = nil, authLogger: Logger? = nil, auth: Auth? = nil) {
         self.config = configuration
         self.logger = logger
         self.authLogger = authLogger ?? logger
+        auth.map { self.auth = $0 }
     }
 
     internal let config: Configuration
@@ -26,15 +27,9 @@ public class JiraAPIClient<AuthSession>: ObservableObject where AuthSession: Aut
     
     @Published public var error: Swift.Error?
 
-    internal var signingIn: AnyCancellable?
+    internal var signingInOut: AnyCancellable?
     internal var fetchingCloudID: AnyCancellable?
     internal var fetchingMyself: AnyCancellable?
-
-    public func signIn() -> AnyPublisher<Never, Swift.Error> {
-        auth.signIn()
-            .mapError { $0 }
-            .eraseToAnyPublisher()
-    }
 
     @Published public var cloudID: JiraAPI.Auth.CloudID?
 
