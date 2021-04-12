@@ -9,21 +9,19 @@ import Foundation
 import JiraAPI
 
 public extension JiraAPIClient {
-    struct User: Identifiable {
+    struct UserProfile: Identifiable {
         public let id: String
-        public let homepage: URL
-        public let avatar: URL
+        public let picture: URL?
         public let email: String?
         public let name: String
     }
 }
 
-extension JiraAPIClient.User {
-    init(response: JiraAPI.Models.UserResponse) {
+extension JiraAPIClient.UserProfile {
+    init(response: JiraAPI.Models.MeResponse) {
         self.init(
             id: response.id,
-            homepage: response.account,
-            avatar: response.avatars.first!.value,
+            picture: response.picture,
             email: response.email,
             name: response.name
         )

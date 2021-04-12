@@ -13,65 +13,31 @@ public class JiraAPIClient<AuthSession> where AuthSession: AuthenticationSession
         auth.map { self.auth = $0 }
     }
 
-    internal let config: Configuration
-
+    let config: Configuration
+    
+    let logger: Logger?
+    let authLogger: Logger?
+    
     lazy internal var auth: Auth = .init(doGetTokens: doGetTokens, doRefreshToken: doRefreshToken, logger: authLogger)
 
-    var logger: Logger?
+    var signingInOut: AnyCancellable?
     
-    var authLogger: Logger?
-
-    public var user: CurrentUser = .init()
-
-    public var resource: Resource?
-    
-    @Published public var error: Swift.Error?
-
-    internal var signingInOut: AnyCancellable?
-    internal var fetchingCloudID: AnyCancellable?
-    internal var fetchingMyself: AnyCancellable?
-
-    @Published public var cloudID: JiraAPI.Auth.CloudID?
-
-
-    public func getCloudID() {
-        if let request = try? JiraAPI.Request.cloudResources() {
-            fetchingCloudID = auth.fetch(request)
-                .map(\.data)
-                .decode(type: [JiraAPI.Models.CloudResourceResponse].self, decoder: JSONDecoder())
-                .map(\.first)
-                .map { $0! }
-                .map(Resource.init)
-                .receive(on: RunLoop.main)
-                .sink(receiveCompletion: { completion in
-                    print("COMPLETED: \(completion)")
-                }, receiveValue: { [unowned self] resource in
-                    cloudID = resource.id
-                    user.update(with: [resource])
-                    print("RESOURCE NAME: \(resource.name)")
-                })
-        } else {
-            print("big error")
-        }
+    let _resources = CurrentValueSubject<[Resource], Never>([])
+    public var resources: AnyPublisher<[Resource], Never> {
+        _resources
+            .eraseToAnyPublisher()
     }
-
-    public func getMyself() {
-        if let cloudID = cloudID, let request = try? JiraAPI.Request.myself(cloudID: cloudID) {
-            fetchingCloudID = auth.fetch(request)
-                .map(\.data)
-                .decode(type: JiraAPI.Models.UserResponse.self, decoder: JSONDecoder())
-                .map(User.init)
-                .receive(on: RunLoop.main)
-                .sink(receiveCompletion: { completion in
-                    print("COMPLETED: \(completion)")
-                }, receiveValue: { [unowned self] in
-                    user.update(with: $0)
-                })
-        } else {
-            print("big error")
-        }
+    
+    let cloudID: CurrentValueSubject<JiraAPI.Auth.CloudID?, Never> = .init(nil)
+    
+    let _userProfile = CurrentValueSubject<UserProfile?, Never>(nil)
+    public var userProfile: AnyPublisher<UserProfile?, Never> {
+        _userProfile
+            .eraseToAnyPublisher()
     }
 }
+
+
 
 public extension JiraAPIClient {
     /// Force refresh of the authorization tokens. This is intended to be used while debugging and not for normal use.
