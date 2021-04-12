@@ -11,19 +11,26 @@ import JiraAPI
 
 public extension JiraAPIClient {
     func signIn() -> AnyPublisher<Never, Swift.Error> {
-        let signIn = PassthroughSubject<Void, Swift.Error>()
+        let getingResources = PassthroughSubject<Void, Swift.Error>()
+        let getProfile = PassthroughSubject<Void, Swift.Error>()
 
         signingInOut = auth.signIn()
             .sink(receiveCompletion: { completion in
                 switch completion {
                 case .failure(let error):
-                    signIn.send(completion: .failure(error))
+                    getingResources.send(completion: .failure(error))
                 case .finished:
-                    signIn.send()
+                    getingResources.send()
+                    getProfile.send()
                 }
             })
+        
+        let gettingProfile = getProfile
+            .flatMap(getPublicProfile)
+            .logOutput(to: logger) { logger, _ in logger.log("SignIn updating profile") }
+            .handleEvents(receiveOutput: _userProfile.send)
 
-        return signIn
+        return getingResources
             .first()
             .flatMap(getResources)
             .logOutput(to: logger) { logger, _ in logger.log("SignIn updating resources") }
@@ -31,10 +38,7 @@ public extension JiraAPIClient {
             .map { $0.first?.id }
             .logOutput(to: logger) { logger, _ in logger.log("SignIn setting cloudID") }
             .handleEvents(receiveOutput: cloudID.send)
-            .map { _ in }
-            .flatMap(getPublicProfile)
-            .logOutput(to: logger) { logger, _ in logger.log("SignIn updating profile") }
-            .handleEvents(receiveOutput: _userProfile.send)
+            .zip(gettingProfile)
             .flatMap { _ in Empty<Never, Swift.Error>() }
             .eraseToAnyPublisher()
     }
