@@ -13,23 +13,17 @@ public class MockAuthenticationSession: AuthenticationSession {
     var url: URL? { nil }
     var error: Error? { nil }
 
-    let completionHandler: ASWebAuthenticationSession.CompletionHandler
+    var completionHandler: ASWebAuthenticationSession.CompletionHandler!
 
-    public required init(
+    public override func configure(
         url: URL,
         callbackURLScheme: String?,
         presentationContextProvider: ASWebAuthenticationPresentationContextProviding?,
         prefersEphemeralWebBrowserSession: Bool,
         completionHandler: @escaping ASWebAuthenticationSession.CompletionHandler
-    ) {
+    ) -> Self {
         self.completionHandler = completionHandler
-        super.init(
-            url: url,
-            callbackURLScheme: callbackURLScheme,
-            presentationContextProvider: presentationContextProvider,
-            prefersEphemeralWebBrowserSession: prefersEphemeralWebBrowserSession,
-            completionHandler: completionHandler
-        )
+        return self
     }
 
     public var startCallCount = 0

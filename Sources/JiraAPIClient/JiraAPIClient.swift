@@ -1,15 +1,22 @@
-import AuthenticationServices
 import Authorization
 import Combine
 import Foundation
 import JiraAPI
+import AuthenticationServices
 import os.log
 
-public class JiraAPIClient<AuthSession> where AuthSession: AuthenticationSession {
-    public init(configuration: Configuration, logger: Logger? = nil, authLogger: Logger? = nil, auth: Auth? = nil) {
+public class JiraAPIClient {
+    public init(
+        configuration: Configuration,
+        logger: Logger? = nil,
+        authLogger: Logger? = nil,
+        auth: Auth? = nil,
+        authenticationSession: AuthenticationSession = AuthenticationSession()
+    ) {
         self.config = configuration
         self.logger = logger
         self.authLogger = authLogger ?? logger
+        self.authenticationSession = authenticationSession
         auth.map { self.auth = $0 }
     }
 
@@ -17,6 +24,8 @@ public class JiraAPIClient<AuthSession> where AuthSession: AuthenticationSession
     
     let logger: Logger?
     let authLogger: Logger?
+    
+    let authenticationSession: AuthenticationSession
     
     lazy internal var auth: Auth = .init(doGetTokens: doGetTokens, doRefreshToken: doRefreshToken, logger: authLogger)
 

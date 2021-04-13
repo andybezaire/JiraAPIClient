@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - log in flow
 ### Changed
 - using logging data task from newer version of combine extras
+- got rid of generics and mocked with configure
+- split login updating tasks to own publishers
 ### Deprecated
 ### Removed
 ### Fixed

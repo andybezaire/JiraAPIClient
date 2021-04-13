@@ -8,6 +8,7 @@
 import Combine
 import Foundation
 import JiraAPI
+import os.log
 
 public extension JiraAPIClient {
     func signIn() -> AnyPublisher<Never, Swift.Error> {
@@ -27,16 +28,16 @@ public extension JiraAPIClient {
         
         let gettingProfile = getProfile
             .flatMap(getPublicProfile)
-            .logOutput(to: logger) { logger, _ in logger.log("SignIn updating profile") }
+            .logOutput(to: logger) { logger, profile in logger.log("SignIn updating profile for \(profile.name)") }
             .handleEvents(receiveOutput: _userProfile.send)
 
         return getingResources
             .first()
             .flatMap(getResources)
-            .logOutput(to: logger) { logger, _ in logger.log("SignIn updating resources") }
+            .logOutput(to: logger) { logger, resources in logger.log("SignIn updating resources, count \(resources.count)") }
             .handleEvents(receiveOutput: _resources.send)
             .map { $0.first?.id }
-            .logOutput(to: logger) { logger, _ in logger.log("SignIn setting cloudID") }
+            .logOutput(to: logger) { logger, cloudID in logger.log("SignIn setting cloudID to \(cloudID ?? "nil")") }
             .handleEvents(receiveOutput: cloudID.send)
             .zip(gettingProfile)
             .flatMap { _ in Empty<Never, Swift.Error>() }

@@ -22,8 +22,7 @@ extension JiraAPIClient {
                 redirectURI: config.redirectURI,
                 userBoundValue: config.userBoundValue
             ) else { completion(.failure(Error.invalidAuthURL)); return }
-            let authSession =
-                AuthSession(
+            let authSession = authenticationSession.configure(
                     url: authURL,
                     callbackURLScheme: config.callbackURLScheme,
                     presentationContextProvider: config.authenticationSessionContextProvider,

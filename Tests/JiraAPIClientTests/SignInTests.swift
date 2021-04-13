@@ -14,7 +14,11 @@ final class SignInTests: JiraAPIClientTests {
     func testSignInSuccessful() {
         let signInFinished = XCTestExpectation(description: "Sign in finished")
 
-        let client = JiraAPIClient<MockSuccessAuthenticationSession>(configuration: testConfigS, logger: logger)
+        let client = JiraAPIClient(
+            configuration: configuration,
+            logger: logger,
+            authenticationSession: MockSuccessAuthenticationSession()
+        )
 
         let url = URL(string: "https://auth.atlassian.com/oauth/token")!
         let data = #"{"access_token":"ACCESS_TOKEN","refresh_token":"REFRESH_TOKEN"}"#
@@ -87,7 +91,7 @@ final class SignInTests: JiraAPIClientTests {
     func testSignInFailsFromAuthenticationSession() {
         let signInFinished = XCTestExpectation(description: "Sign in finished")
 
-        let client = JiraAPIClient<MockFailAuthenticationSession>(configuration: testConfigF)
+        let client = JiraAPIClient(configuration: configuration, authenticationSession: MockFailAuthenticationSession())
 
         cancellable = client.signIn()
             .sink(receiveCompletion: { completion in
@@ -107,7 +111,10 @@ final class SignInTests: JiraAPIClientTests {
     func testSignInFailsFromInternalAuthenticationSession() {
         let signInFinished = XCTestExpectation(description: "Sign in finished")
 
-        let client = JiraAPIClient<MockFailInternalAuthenticationSession>(configuration: testConfigFI)
+        let client = JiraAPIClient(
+            configuration: configuration,
+            authenticationSession: MockFailInternalAuthenticationSession()
+        )
 
         cancellable = client.signIn()
             .sink(receiveCompletion: { completion in
@@ -116,8 +123,8 @@ final class SignInTests: JiraAPIClientTests {
                     XCTFail("Sign in should fail")
                 case .failure(let error):
                     XCTAssertEqual(
-                        error as? JiraAPIClient<MockFailInternalAuthenticationSession>.Error,
-                        JiraAPIClient<MockFailInternalAuthenticationSession>.Error.authorizationCodeInternalError,
+                        error as? JiraAPIClient.Error,
+                        JiraAPIClient.Error.authorizationCodeInternalError,
                         "error should be from auth"
                     )
                     // success
