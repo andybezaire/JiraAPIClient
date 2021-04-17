@@ -7,17 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
-- separate logger for auth
-- user profile object
-- log in flow
 ### Changed
-- using logging data task from newer version of combine extras
-- got rid of generics and mocked with configure
-- split login updating tasks to own publishers
 ### Deprecated
 ### Removed
 ### Fixed
 ### Security
+
+## [0.3.0] - 2021-04-17
+### Added
+- separate logger for auth
+- user profile object
+- log in flow
+- user profile view model
+### Changed
+- using logging data task from newer version of combine extras
+- got rid of generics and mocked with configure
+- split login updating tasks to own publishers
 
 ## [0.2.0] - 2021-04-05
 ### Added
